@@ -303,7 +303,7 @@ class Fish {
 
   update() {
     this.vel.add(this.acc);
-    this.vel.limit(this.maxSpeed); // Use potentially boosted speed
+    this.vel.limit(this.maxSpeed);
     this.pos.add(this.vel);
     this.acc.mult(0);
 
@@ -434,11 +434,24 @@ class Fish {
   }
 
   edges() {
-    let buffer = this.size * 1.5; // Larger buffer for curves
-    if (this.pos.x > width + buffer) this.pos.x = -buffer;
-    else if (this.pos.x < -buffer) this.pos.x = width + buffer;
-    if (this.pos.y > height + buffer) this.pos.y = -buffer;
-    else if (this.pos.y < -buffer) this.pos.y = height + buffer;
+    let buffer = this.size * 0.5; // Smaller buffer for edge detection
+    
+    // Bounce off edges instead of wrapping
+    if (this.pos.x > width - buffer) {
+      this.pos.x = width - buffer;
+      this.vel.x *= -1; // Reverse x velocity
+    } else if (this.pos.x < buffer) {
+      this.pos.x = buffer;
+      this.vel.x *= -1;
+    }
+    
+    if (this.pos.y > height - buffer) {
+      this.pos.y = height - buffer;
+      this.vel.y *= -1; // Reverse y velocity
+    } else if (this.pos.y < buffer) {
+      this.pos.y = buffer;
+      this.vel.y *= -1;
+    }
   }
 }
 
@@ -688,12 +701,24 @@ class Shark {
 
 
   edges() {
-      // Wrap around screen edges - use a buffer based on size
-      let buffer = this.size * 1.5; // Generous buffer
-      if (this.pos.x > width + buffer) this.pos.x = -buffer;
-      else if (this.pos.x < -buffer) this.pos.x = width + buffer;
-      if (this.pos.y > height + buffer) this.pos.y = -buffer;
-      else if (this.pos.y < -buffer) this.pos.y = height + buffer;
+      // Bounce off screen edges - use a buffer based on size
+      let buffer = this.size * 0.5;
+      
+      if (this.pos.x > width - buffer) {
+          this.pos.x = width - buffer;
+          this.vel.x *= -1; // Reverse x velocity
+      } else if (this.pos.x < buffer) {
+          this.pos.x = buffer;
+          this.vel.x *= -1;
+      }
+      
+      if (this.pos.y > height - buffer) {
+          this.pos.y = height - buffer;
+          this.vel.y *= -1; // Reverse y velocity
+      } else if (this.pos.y < buffer) {
+          this.pos.y = buffer;
+          this.vel.y *= -1;
+      }
   }
 }
 
