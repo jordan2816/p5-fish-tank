@@ -434,9 +434,10 @@ class Fish {
   }
 
   edges() {
-    let buffer = this.size * 0.5; // Smaller buffer for edge detection
+    // Calculate buffer based on the fish's visual appearance, not just its center point
+    let buffer = this.size * 0.7; // Increased from 0.5 to account for the fish's full visual width
     
-    // Bounce off edges instead of wrapping
+    // Bounce off edges with more precision
     if (this.pos.x > width - buffer) {
       this.pos.x = width - buffer;
       this.vel.x *= -1; // Reverse x velocity
@@ -452,6 +453,13 @@ class Fish {
       this.pos.y = buffer;
       this.vel.y *= -1;
     }
+  }
+  
+  // Add a new method to force fish to stay in bounds after window resize
+  constrainToCanvas() {
+    let buffer = this.size * 0.7;
+    this.pos.x = constrain(this.pos.x, buffer, width - buffer);
+    this.pos.y = constrain(this.pos.y, buffer, height - buffer);
   }
 }
 
@@ -701,24 +709,32 @@ class Shark {
 
 
   edges() {
-      // Bounce off screen edges - use a buffer based on size
-      let buffer = this.size * 0.5;
-      
-      if (this.pos.x > width - buffer) {
-          this.pos.x = width - buffer;
-          this.vel.x *= -1; // Reverse x velocity
-      } else if (this.pos.x < buffer) {
-          this.pos.x = buffer;
-          this.vel.x *= -1;
-      }
-      
-      if (this.pos.y > height - buffer) {
-          this.pos.y = height - buffer;
-          this.vel.y *= -1; // Reverse y velocity
-      } else if (this.pos.y < buffer) {
-          this.pos.y = buffer;
-          this.vel.y *= -1;
-      }
+    // Calculate buffer based on the shark's actual visual size 
+    // The shark has fins and tail that extend beyond its center point
+    let buffer = this.size * 0.8; // Increased from 0.5 to account for shark's full visual width
+    
+    if (this.pos.x > width - buffer) {
+      this.pos.x = width - buffer;
+      this.vel.x *= -1; // Reverse x velocity
+    } else if (this.pos.x < buffer) {
+      this.pos.x = buffer;
+      this.vel.x *= -1;
+    }
+    
+    if (this.pos.y > height - buffer) {
+      this.pos.y = height - buffer;
+      this.vel.y *= -1; // Reverse y velocity
+    } else if (this.pos.y < buffer) {
+      this.pos.y = buffer;
+      this.vel.y *= -1;
+    }
+  }
+  
+  // Add a new method to force shark to stay in bounds after window resize
+  constrainToCanvas() {
+    let buffer = this.size * 0.8;
+    this.pos.x = constrain(this.pos.x, buffer, width - buffer);
+    this.pos.y = constrain(this.pos.y, buffer, height - buffer);
   }
 }
 
@@ -758,4 +774,11 @@ class BloomParticle {
 // --- Window Resize ---
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  // Ensure fish and shark stay within new bounds after resize
+  if (shark) {
+    shark.constrainToCanvas();
+  }
+  for (let fish of fishes) {
+    fish.constrainToCanvas();
+  }
 }
